@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_generic_services = true;
+package io.mkth.grpc.authentication;
+
+message Empty {
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string message = 1;
+}
+
+message FindCustomerRequest {
+  string username = 1;
+}
+
+message FindCustomerResponse {
+  string username = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message SaveCustomerRequest {
+  string username = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message SaveCustomerResponse {
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  string email = 4;
+  string password = 5;
+}
+
+service LoginService {
+  rpc login (LoginRequest) returns (LoginResponse);
+  rpc findUser (FindCustomerRequest) returns (FindCustomerResponse);
+  rpc streamUser (Empty) returns (stream FindCustomerResponse);
+  rpc saveUser (SaveCustomerRequest) returns (SaveCustomerResponse);
+}
