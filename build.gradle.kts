@@ -26,15 +26,12 @@ dependencies {
 	//GRPC Server
 	implementation("net.devh:grpc-server-spring-boot-starter:2.10.1.RELEASE")
 
-	//implementation("com.google.protobuf:protobuf-java:3.6.1")
-
 	implementation("com.salesforce.servicelibs:reactor-grpc-stub:1.0.1")
 
-	implementation("io.grpc:grpc-netty:1.19.0")
-//	implementation("io.grpc:grpc-netty-shaded:1.19.0")
-	implementation("io.grpc:grpc-stub:1.19.0")
-	implementation("io.grpc:grpc-protobuf:1.19.0")
-
+	implementation("io.grpc:grpc-netty:1.34.0")
+	implementation("io.grpc:grpc-netty-shaded:1.34.0")
+	implementation("io.grpc:grpc-stub:1.34.0")
+	implementation("io.grpc:grpc-protobuf:1.34.0")
 
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -43,6 +40,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 }

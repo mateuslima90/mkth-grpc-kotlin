@@ -4,12 +4,15 @@ import io.grpc.CallOptions
 import io.grpc.Status
 import io.mkth.grpc.authentication.*
 import io.mkth.security.authentication.model.User
+import io.mkth.security.authentication.model.UserDTO
 import net.devh.boot.grpc.server.service.GrpcService
+import org.springframework.data.domain.PageRequest
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 import java.time.Duration
-import java.util.stream.Stream
+import java.util.*
+import java.util.stream.Collectors
 
 @GrpcService
 class GrpcAuthenticationService(private val customerService: CustomerService)
@@ -18,7 +21,7 @@ class GrpcAuthenticationService(private val customerService: CustomerService)
     override fun login(request: Mono<LoginRequest>): Mono<LoginResponse> {
         return request
                 .flatMap { customer -> customerService.authenticate(customer) }
-                .map { LoginResponse.newBuilder().setMessage(it.toString()).build() }
+                .map { LoginResponse.newBuilder().setMessage(it).build() }
     }
 
     override fun findUser(request: Mono<FindCustomerRequest>): Mono<FindCustomerResponse> {
@@ -43,13 +46,42 @@ class GrpcAuthenticationService(private val customerService: CustomerService)
                 .delayElements(Duration.ofMillis(2000L))
     }
 
+    override fun findAllUser(request: Mono<FindAllUserRequest>): Mono<FindAllUserResponse> {
+        return request
+                .flatMap { r ->  customerService.findAllUsersByPage(PageRequest.of(r.page, r.size))}
+                .map { c -> buildFindAllUser(c.page, c.size, c.TotalPages, c.TotalElements, c.content, ) }
+    }
+
     private fun findResponse(customer: User): Mono<FindCustomerResponse> {
         return Mono.justOrEmpty(customer)
                 .map { buildFindCustomerResponse(customer) }
     }
 
+    private fun buildUser(u: UserDTO): io.mkth.grpc.authentication.User {
+        return io.mkth.grpc.authentication.User.newBuilder()
+                .setId(u.id)
+                .setUsername(u.username)
+                .setEmail(u.email)
+                .build()
+    }
+
+    private fun buildFindAllUser(page: Int, size: Int, totalPages: Long,
+                                 totalElements: Long, content: List<UserDTO>): FindAllUserResponse {
+
+        val result = content.stream().map { u -> buildUser(u) }.collect(Collectors.toList()).asIterable()
+
+        return FindAllUserResponse.newBuilder()
+                .setPage(page)
+                .setSize(size)
+                .setTotalPages(totalPages.toInt())
+                .setTotalElements(totalElements.toInt())
+                .addAllUser(result)
+                .build()
+    }
+
     private fun buildFindCustomerResponse(user: User) =
             FindCustomerResponse.newBuilder()
+                    .setId(user.id)
                     .setUsername(user.username)
                     .setName(user.name)
                     .setEmail(user.email)

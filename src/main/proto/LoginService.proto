@@ -12,8 +12,14 @@ message LoginRequest {
   string password = 2;
 }
 
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 4;
+}
+
 message LoginResponse {
-  string message = 1;
+  bool message = 1;
 }
 
 message FindCustomerRequest {
@@ -21,9 +27,10 @@ message FindCustomerRequest {
 }
 
 message FindCustomerResponse {
-  string username = 1;
-  string name = 2;
-  string email = 3;
+  string id = 1;
+  string username = 2;
+  string name = 3;
+  string email = 4;
 }
 
 message SaveCustomerRequest {
@@ -31,6 +38,19 @@ message SaveCustomerRequest {
   string name = 2;
   string email = 3;
   string password = 4;
+}
+
+message FindAllUserRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message FindAllUserResponse {
+  repeated User user = 1;
+  int32 page = 2;
+  int32 size = 3;
+  int32 totalPages = 4;
+  int32 totalElements = 5;
 }
 
 message SaveCustomerResponse {
@@ -44,6 +64,7 @@ message SaveCustomerResponse {
 service LoginService {
   rpc login (LoginRequest) returns (LoginResponse);
   rpc findUser (FindCustomerRequest) returns (FindCustomerResponse);
+  rpc findAllUser (FindAllUserRequest) returns (FindAllUserResponse);
   rpc streamUser (Empty) returns (stream FindCustomerResponse);
   rpc saveUser (SaveCustomerRequest) returns (SaveCustomerResponse);
 }

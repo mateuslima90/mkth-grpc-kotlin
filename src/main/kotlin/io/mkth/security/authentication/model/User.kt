@@ -9,3 +9,14 @@ data class User(@Id val id: String? = null,
                 val name: String? = null,
                 val email: String? = null,
                 val password: String? = null)
+
+
+data class UserDTO(val id: String?,
+                   val username: String?,
+                   val email: String?)
+
+data class Pages(val content: List<UserDTO>,
+                 var page: Int,
+                 var size: Int,
+                 var TotalPages: Long,
+                 var TotalElements: Long)
