@@ -4,7 +4,6 @@ import io.mkth.security.authentication.model.Pages
 import io.mkth.security.authentication.model.User
 import io.mkth.security.authentication.model.UserDTO
 import io.mkth.security.authentication.service.CustomerService
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -17,7 +16,7 @@ class CustomerController(private val customerService: CustomerService) {
 
     @PostMapping("/customer")
     fun saveUser(@RequestBody user: User) : Mono<User> {
-        return customerService.createUser(user)
+        return customerService.saveUser(user)
     }
 
     @GetMapping("/customer/{username}")
@@ -26,8 +25,9 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
     @GetMapping("/customers")
-    fun getAllUser() : Flux<User> {
-        return customerService.findAllUser();
+    fun getAllUser() : Flux<UserDTO> {
+        return customerService.findAllUser()
+                .map { UserDTO(it.id, it.username, it.email) };
     }
 
     @GetMapping("/allUsers")
@@ -37,8 +37,9 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
     @GetMapping("/stream/customers", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun getAllUserInStream() : Flux<User> {
+    fun getAllUserInStream() : Flux<UserDTO> {
         return customerService.findAllUser()
+                .map { UserDTO(it.id, it.username, it.email) }
                 .delayElements(Duration.ofMillis(2500L))
     }
 }

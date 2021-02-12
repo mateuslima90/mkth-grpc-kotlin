@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'maven'
+    id 'maven-publish'
+    id 'nebula.source-jar' version '11.0.0'
+}
+
+group = "io.mkth.grpc.authentication.protobuf"
+version = "1.0.0-SNAPSHOT"
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// declare general purpose jar and pom publication
+publishing {
+    publications {
+        proto(MavenPublication) {
+            artifact tasks.sourceJar
+            from components.java
+            groupId = group
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}

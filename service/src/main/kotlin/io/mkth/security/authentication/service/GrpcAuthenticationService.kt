@@ -11,14 +11,13 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 import java.time.Duration
-import java.util.*
 import java.util.stream.Collectors
 
 @GrpcService
 class GrpcAuthenticationService(private val customerService: CustomerService)
     : ReactorLoginServiceGrpc.LoginServiceImplBase() {
 
-    override fun login(request: Mono<LoginRequest>): Mono<LoginResponse> {
+    override fun authenticate(request: Mono<LoginRequest>): Mono<LoginResponse> {
         return request
                 .flatMap { customer -> customerService.authenticate(customer) }
                 .map { LoginResponse.newBuilder().setMessage(it).build() }
@@ -36,7 +35,7 @@ class GrpcAuthenticationService(private val customerService: CustomerService)
         return request
                 .map { c -> User(username = c.username, name = c.name,
                         email = c.email, password = c.password) }
-                .flatMap { customerService.createUser(it)}
+                .flatMap { customerService.saveUser(it)}
                 .map { buildSaveCustomerResponse(it) }
     }
 
@@ -50,6 +49,20 @@ class GrpcAuthenticationService(private val customerService: CustomerService)
         return request
                 .flatMap { r ->  customerService.findAllUsersByPage(PageRequest.of(r.page, r.size))}
                 .map { c -> buildFindAllUser(c.page, c.size, c.TotalPages, c.TotalElements, c.content, ) }
+    }
+
+    override fun updateUser(request: Mono<UpdateUserRequest>): Mono<UpdateUserResponse> {
+        return request
+                .flatMap { r -> customerService.updateUser(User(username = r.username, email = r.email)) }
+                .map { UpdateUserResponse.newBuilder().setResponse(true).build() }
+                .switchIfEmpty { Mono.error(Status.NOT_FOUND
+                        .withDescription("not found").asRuntimeException()) }
+    }
+
+    override fun deleteUser(request: Mono<DeleteUserRequest>): Mono<DeleteUserResponse> {
+        return request
+                .flatMap { r -> customerService.deleteUser(r.username) }
+                .map { DeleteUserResponse.newBuilder().setResponse(true).build() }
     }
 
     private fun findResponse(customer: User): Mono<FindCustomerResponse> {
@@ -91,9 +104,7 @@ class GrpcAuthenticationService(private val customerService: CustomerService)
             SaveCustomerResponse.newBuilder()
                     .setId(user.id)
                     .setUsername(user.username)
-                    .setName(user.name)
                     .setEmail(user.email)
-                    .setPassword(user.password)
                     .build()
 
     override fun getCallOptions(methodId: Int): CallOptions {

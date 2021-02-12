@@ -11,4 +11,6 @@ interface CustomerRepository : ReactiveMongoRepository<User, String> {
     fun findUserByUsername(username: String) : Mono<User>
 
     fun findAllByIdNotNullOrderByIdAsc(page: Pageable) : Flux<User>
+
+    fun deleteByUsername(username: String) : Mono<User>
 }

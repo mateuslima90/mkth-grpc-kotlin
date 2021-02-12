@@ -7,7 +7,9 @@ import io.mkth.security.authentication.model.User
 import io.mkth.security.authentication.model.UserDTO
 import io.mkth.security.authentication.repository.CustomerRepository
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -18,7 +20,7 @@ class CustomerService(private val customerRepository: CustomerRepository) {
     fun findUser(username: String): Mono<User> {
         return customerRepository.findUserByUsername(username)
                 .switchIfEmpty(Mono.empty())
-                .onErrorResume { error -> throw UserNotFoundException("User not found $error") }
+                .onErrorResume { error -> throw UserNotFoundException(error.message!!) }
     }
 
     fun findAllUser(): Flux<User> {
@@ -41,11 +43,26 @@ class CustomerService(private val customerRepository: CustomerRepository) {
         return this.findUser(user.username)
                 .map { c -> validatePassword(user.password, c.password!!) }
                 .defaultIfEmpty(false)
-                .onErrorResume { error -> throw UserNotFoundException("User not found $error") }
+                .onErrorResume { error -> throw UserNotFoundException(error.message!!) }
     }
 
-    fun createUser(user: User): Mono<User> {
+    fun saveUser(user: User): Mono<User> {
         return customerRepository.save(user)
+                .onErrorResume { Mono.error(ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_ENTITY, "Failed to processing this entity", it.cause)) }
+    }
+
+    fun updateUser(user: User): Mono<User> {
+        return Mono.just(user)
+                .flatMap { customerRepository.findUserByUsername(user.username!!) }
+                .flatMap { customerRepository.save(
+                        User(id = it.id, username = user.username, email = user.email,name = it.name, password= it.password))
+                }
+                .switchIfEmpty(Mono.empty())
+    }
+
+    fun deleteUser(username: String): Mono<User> {
+        return customerRepository.deleteByUsername(username)
     }
 
     private fun validatePassword(requestPassword: String, dbPassword: String): Boolean {

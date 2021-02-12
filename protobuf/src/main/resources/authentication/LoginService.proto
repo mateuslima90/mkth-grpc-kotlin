@@ -7,15 +7,15 @@ package io.mkth.grpc.authentication;
 message Empty {
 }
 
-message LoginRequest {
-  string username = 1;
-  string password = 2;
-}
-
 message User {
   string id = 1;
   string username = 2;
-  string email = 4;
+  string email = 3;
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
 }
 
 message LoginResponse {
@@ -33,13 +33,6 @@ message FindCustomerResponse {
   string email = 4;
 }
 
-message SaveCustomerRequest {
-  string username = 1;
-  string name = 2;
-  string email = 3;
-  string password = 4;
-}
-
 message FindAllUserRequest {
   int32 page = 1;
   int32 size = 2;
@@ -53,18 +46,42 @@ message FindAllUserResponse {
   int32 totalElements = 5;
 }
 
+message SaveCustomerRequest {
+  string username = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+}
+
 message SaveCustomerResponse {
   string id = 1;
   string username = 2;
-  string name = 3;
-  string email = 4;
-  string password = 5;
+  string email = 3;
+}
+
+message UpdateUserRequest {
+  string username = 1;
+  string email = 2;
+}
+
+message UpdateUserResponse {
+  bool response = 1;
+}
+
+message DeleteUserRequest {
+  string username = 1;
+}
+
+message DeleteUserResponse {
+  bool response = 1;
 }
 
 service LoginService {
-  rpc login (LoginRequest) returns (LoginResponse);
+  rpc authenticate (LoginRequest) returns (LoginResponse);
   rpc findUser (FindCustomerRequest) returns (FindCustomerResponse);
   rpc findAllUser (FindAllUserRequest) returns (FindAllUserResponse);
   rpc streamUser (Empty) returns (stream FindCustomerResponse);
   rpc saveUser (SaveCustomerRequest) returns (SaveCustomerResponse);
+  rpc updateUser (UpdateUserRequest) returns (UpdateUserResponse);
+  rpc deleteUser (DeleteUserRequest) returns (DeleteUserResponse);
 }

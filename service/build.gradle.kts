@@ -23,10 +23,18 @@ val grpc_version by extra ("1.19.0")
 
 dependencies {
 
+	//Consul all:3.3.1")
+	implementation("org.springframework.cloud:spring-cloud-starter-consul-discovery:3.0.1")
+
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+
 	//GRPC Server
 	implementation("net.devh:grpc-server-spring-boot-starter:2.10.1.RELEASE")
-
 	implementation("com.salesforce.servicelibs:reactor-grpc-stub:1.0.1")
+
+	//protobuf("io.mkth.grpc.authentication.protobuf:authentication-protobuf:1.0.0-SNAPSHOT")
+
+	protobuf(files("/Users/mateuslimafonseca/Projects/grpc-authentication/protobuf/src/main/resources/authentication/LoginService.proto"))
 
 	implementation("io.grpc:grpc-netty:1.34.0")
 	implementation("io.grpc:grpc-netty-shaded:1.34.0")
@@ -76,21 +84,5 @@ protobuf {
 				id("reactor")
 			}
 		}
-	}
-}
-
-sourceSets {
-	getByName("main").java.srcDirs("generated/source/proto/main/grpc")
-	getByName("main").java.srcDirs("generated/source/proto/main/reactor")
-	getByName("main").java.srcDirs("generated/source/proto/main/java")
-	getByName("main").java.srcDirs("generated/source/proto/main/kotlin")
-}
-
-idea {
-	module {
-		generatedSourceDirs.plusAssign(file("build/generated/source/proto/main/grpc"))
-		generatedSourceDirs.plusAssign(file("build/generated/source/proto/main/reactor"))
-		generatedSourceDirs.plusAssign(file("build/generated/source/proto/main/java"))
-		generatedSourceDirs.plusAssign(file("build/generated/source/proto/main/kotlin"))
 	}
 }
