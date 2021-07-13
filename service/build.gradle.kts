@@ -34,6 +34,9 @@ dependencies {
 
 	//protobuf("io.mkth.grpc.authentication.protobuf:authentication-protobuf:1.0.0-SNAPSHOT")
 
+	//bcrypt
+	implementation("org.mindrot:jbcrypt:0.4")
+
 	protobuf(files("/Users/mateuslimafonseca/Projects/grpc-authentication/protobuf/src/main/resources/authentication/LoginService.proto"))
 
 	implementation("io.grpc:grpc-netty:1.34.0")

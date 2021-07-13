@@ -9,7 +9,7 @@ data class User(@Id val id: String? = null,
                 @Indexed(unique = true) val username: String? = null,
                 val name: String? = null,
                 @Indexed(unique = true) val email: String? = null,
-                val password: String? = null)
+                var password: String? = null)
 
 
 data class UserDTO(val id: String?,

@@ -1,10 +1,6 @@
-spring:
-  application:
-    name: authentication
-
-  cloud:
-    consul:
-      host: localhost
-      port: 8500
-      config:
-        enabled: true
+cloud:
+  consul:
+    host: 172.18.0.3
+    port: 8500
+    config:
+      enabled: true
